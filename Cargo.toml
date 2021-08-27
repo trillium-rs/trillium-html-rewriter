@@ -5,8 +5,7 @@ authors = ["Jacob Rothstein <hi@jbr.me>"]
 edition = "2018"
 description = "streaming html rewriter for trillium.rs"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/trillium-rs/trillium"
-readme = "../README.md"
+repository = "https://github.com/trillium-rs/trillium-html-rewriter"
 keywords = ["trillium", "framework", "async"]
 categories = ["web-programming::http-server", "web-programming"]
 
