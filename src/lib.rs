@@ -50,17 +50,14 @@ assert_ok!(conn, "<html><body><h1>title</h1><p>body</p></body></html>");
 */
 
 use cfg_if::cfg_if;
-use futures_lite::io::BufReader;
 pub use lol_async::html;
 use lol_async::{html::Settings, rewrite};
-use std::future::Future;
-use std::str::FromStr;
-use trillium::async_trait;
-use trillium::http_types::{
-    headers::{CONTENT_LENGTH, CONTENT_TYPE},
-    mime::Mime,
+use mime::Mime;
+use std::{future::Future, str::FromStr};
+use trillium::{
+    async_trait, Body, Conn, Handler,
+    KnownHeaderName::{ContentLength, ContentType},
 };
-use trillium::{http_types::Body, Conn, Handler};
 
 /**
 trillium handler for html rewriting
@@ -95,8 +92,8 @@ impl Handler for HtmlRewriter {
     async fn run(&self, mut conn: Conn) -> Conn {
         let html = conn
             .headers_mut()
-            .get(CONTENT_TYPE)
-            .and_then(|c| Mime::from_str(c.as_str()).ok())
+            .get_str(ContentType)
+            .and_then(|c| Mime::from_str(c).ok())
             .map(|m| m.subtype() == "html")
             .unwrap_or_default();
 
@@ -104,8 +101,8 @@ impl Handler for HtmlRewriter {
             let body = conn.inner_mut().take_response_body().unwrap();
             let (fut, reader) = rewrite(body, (self.settings)());
             spawn_local(fut);
-            conn.headers_mut().remove(CONTENT_LENGTH); // we no longer know the content length, if we ever did
-            conn.with_body(Body::from_reader(BufReader::new(reader), None))
+            conn.headers_mut().remove(ContentLength); // we no longer know the content length, if we ever did
+            conn.with_body(Body::new_streaming(reader, None))
         } else {
             conn
         }
