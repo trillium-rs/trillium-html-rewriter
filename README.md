@@ -1,27 +1,37 @@
-# Welcome to Trillium!
+trillium handler that rewrites html using lol-html and the
+[`lol_async`] library.
 
-## [📖 Guide 📖](https://trillium.rs/)
+this crate currently requires configuring the runtime,
+unfortunately. use one of the `"async-std"`, `"smol"`, or `"tokio"`
+features. do not use the default feature, it may change at any time.
 
-The guide provides an architectural overview and lay of the land
-connecting the trillium crates.
+```
+use trillium_html_rewriter::{
+    html::{element, html_content::ContentType, Settings},
+    HtmlRewriter,
+};
 
-## [📑 Rustdocs 📑](https://docs.trillium.rs)
+let handler = (
+    |conn: trillium::Conn| async move {
+        conn.with_header(("content-type", "text/html"))
+            .with_status(200)
+            .with_body("<html><body><p>body</p></body></html>")
+    },
+    HtmlRewriter::new(|| Settings {
+        element_content_handlers: vec![element!("body", |el| {
+            el.prepend("<h1>title</h1>", ContentType::Html);
+            Ok(())
+        })],
+         ..Settings::default()
+    }),
+);
 
-The rustdocs represent the best way to learn about any of trillium's
-individual crates and the specific interfaces.
+# async_global_executor::block_on(async move {
+use trillium_testing::prelude::*;
 
+let conn = async_global_executor::spawn(async move {
+    get("/").run_async(&handler).await
+}).await;
 
-<br/><hr/><br/>
-Legal:
-
-Licensed under either of
- * Apache License, Version 2.0
-   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license
-   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)</sup>
-   
-at your option.
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
+assert_ok!(conn, "<html><body><h1>title</h1><p>body</p></body></html>");
+# });
