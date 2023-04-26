@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["RecvErr"],"mod":["mpmc","mpsc","spmc","spsc"],"struct":["NoRecv"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["rewrite_str"],"macro":["comments","doc_comments","doc_text","doctype","element","end","text"],"mod":["errors","html_content"],"struct":["AsciiCompatibleEncoding","DocumentContentHandlers","ElementContentHandlers","HtmlRewriter","MemorySettings","RewriteStrSettings","Selector","Settings"],"trait":["OutputSink"]};

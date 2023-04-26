@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AttributeNameError","CommentTextError","RewritingError","SelectorError","TagNameError"],"struct":["MemoryLimitExceededError","ParsingAmbiguityError"]};

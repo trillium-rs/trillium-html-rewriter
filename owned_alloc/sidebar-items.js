@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MaybeUninitAlloc","RawVecErr"],"struct":["AllocErr","Cache","LayoutErr","OwnedAlloc","RawVec","UninitAlloc"]};
