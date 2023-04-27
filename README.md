@@ -13,7 +13,7 @@ use trillium_html_rewriter::{
 
 let handler = (
     |conn: trillium::Conn| async move {
-        conn.with_header(("content-type", "text/html"))
+        conn.with_header("content-type", "text/html")
             .with_status(200)
             .with_body("<html><body><p>body</p></body></html>")
     },
