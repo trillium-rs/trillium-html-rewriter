@@ -8,7 +8,7 @@
     nonstandard_style,
     unused_qualifications
 )]
-#![doc = "../README.md"]
+#![doc = include_str!("../README.md")]
 
 use cfg_if::cfg_if;
 pub use lol_async::html;
