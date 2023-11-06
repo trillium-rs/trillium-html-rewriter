@@ -18,7 +18,7 @@ tokio = ["tokio_crate"]
 [dependencies]
 async-global-executor = { version = "2.3.1", optional = true }
 cfg-if = "1.0.0"
-futures-lite = "1.13.0"
+futures-lite = "2.0.1"
 lol-async = "0.2.0"
 trillium = "0.2.9"
 mime = "0.3.17"
