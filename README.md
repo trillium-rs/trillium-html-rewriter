@@ -1,19 +1,15 @@
-trillium handler that rewrites html using lol-html and the
-[`lol_async`] library.
+[`trillium`](https://docs.rs/trillium) handler that rewrites html using
+[`lol-html`](https://docs.rs/lol-html) through the [`lol-async`](https://docs.rs/lol-async) library.
 
-this crate currently requires configuring the runtime,
-unfortunately. use one of the `"async-std"`, `"smol"`, or `"tokio"`
-features. do not use the default feature, it may change at any time.
-
-```
+```rust
 use trillium_html_rewriter::{
-    html::{element, html_content::ContentType, Settings},
-    HtmlRewriter,
+    HtmlRewriter, Settings,
+    html::{element, html_content::ContentType},
 };
 
 let handler = (
     |conn: trillium::Conn| async move {
-        conn.with_header("content-type", "text/html")
+        conn.with_response_header("content-type", "text/html")
             .with_status(200)
             .with_body("<html><body><p>body</p></body></html>")
     },
@@ -22,16 +18,17 @@ let handler = (
             el.prepend("<h1>title</h1>", ContentType::Html);
             Ok(())
         })],
-         ..Settings::default()
+        ..Settings::new_send()
     }),
 );
 
-# async_global_executor::block_on(async move {
-use trillium_testing::prelude::*;
+use trillium_testing::{TestServer, block_on};
 
-let conn = async_global_executor::spawn(async move {
-    get("/").run_async(&handler).await
-}).await;
-
-assert_ok!(conn, "<html><body><h1>title</h1><p>body</p></body></html>");
-# });
+block_on(async move {
+    let app = TestServer::new(handler).await;
+    app.get("/")
+        .await
+        .assert_ok()
+        .assert_body("<html><body><h1>title</h1><p>body</p></body></html>");
+});
+```
