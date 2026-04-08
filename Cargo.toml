@@ -2,42 +2,24 @@
 name = "trillium-html-rewriter"
 version = "0.3.0"
 authors = ["Jacob Rothstein <hi@jbr.me>"]
-edition = "2018"
+edition = "2024"
 description = "streaming html rewriter for trillium.rs"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/trillium-rs/trillium-html-rewriter"
 keywords = ["trillium", "framework", "async"]
 categories = ["web-programming::http-server", "web-programming"]
 
-[features]
-async-std = ["async_std_crate"]
-default = ["async-global-executor"]
-smol = ["async-global-executor"]
-tokio = ["tokio_crate"]
 
 [dependencies]
-async-global-executor = { version = "2.3.1", optional = true }
-cfg-if = "1.0.0"
-futures-lite = "2.0.1"
-lol-async = "0.2.0"
-trillium = "0.2.9"
+async-global-executor = { version = "3.1.0", optional = true }
+futures-lite = "2.6.1"
+lol-async = "0.3.0"
+trillium = "1.0.0-rc.1"
 mime = "0.3.17"
 
-[dependencies.tokio_crate]
-version = "1.28.0"
-optional = true
-package = "tokio"
-features = ["rt"]
-
-[dependencies.async_std_crate]
-version = "1.12.0"
-optional = true
-package = "async-std"
-features = ["unstable"]
-
 [dev-dependencies]
-env_logger = "0.11.1"
-trillium-proxy = "0.4.1"
-trillium-rustls = "0.6.0"
-trillium-smol = "0.3.0"
-trillium-testing = "0.5.0"
+env_logger = "0.11.10"
+trillium-proxy = "0.6.0-rc.1"
+trillium-rustls = "0.10.0-rc.1"
+trillium-smol = "0.5.0-rc.1"
+trillium-testing = "0.8.0-rc.1"

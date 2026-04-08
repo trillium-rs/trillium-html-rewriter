@@ -29,17 +29,17 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --workspace --features smol,trillium-testing/smol
+          args: --all trillium-testing/smol
       - name: Async-Std
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --workspace --features async-std,trillium-testing/async-std
+          args: --all --features trillium-testing/async-std
       - name: Tokio
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --workspace --features tokio,trillium-testing/tokio
+          args: --all --features trillium-testing/tokio
 
   check_fmt_and_docs:
     name: Lints and Docs
