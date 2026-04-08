@@ -22,7 +22,7 @@ jobs:
       - name: Generate code coverage
         run: cargo +nightly tarpaulin --verbose --features smol,trillium-testing/smol --timeout 120 --out Xml
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           fail_ci_if_error: true
