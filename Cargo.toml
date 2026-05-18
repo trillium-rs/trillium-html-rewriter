@@ -17,7 +17,7 @@ mime = "0.3.17"
 
 [dev-dependencies]
 env_logger = "0.11.10"
-trillium-proxy = "0.7.0"
+trillium-proxy = "0.8.0"
 trillium-rustls = "0.11.1"
 trillium-smol = "0.6.1"
 trillium-testing = "0.9.0"
