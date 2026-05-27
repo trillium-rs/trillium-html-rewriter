@@ -23,9 +23,14 @@ use trillium::{
     KnownHeaderName::{ContentLength, ContentType},
 };
 
-/**
-trillium handler for html rewriting
-*/
+/// A trillium [`Handler`] that rewrites HTML response bodies with
+/// [`lol-html`](https://docs.rs/lol-html), using [`lol-async`](https://docs.rs/lol-async).
+///
+/// It wraps the response produced by other handlers: in [`before_send`](Handler::before_send) it
+/// inspects the outgoing `Content-Type` and, if the mime subtype is `html` (e.g. `text/html`),
+/// replaces the response body with a streaming rewrite driven by the [`Settings`] returned from the
+/// closure passed to [`HtmlRewriter::new`]. Responses with any other content type (or none) are
+/// passed through unchanged.
 pub struct HtmlRewriter {
     settings: Arc<dyn Fn() -> Settings<'static, 'static> + Send + Sync + 'static>,
 }
@@ -37,7 +42,7 @@ impl Debug for HtmlRewriter {
 }
 
 impl Handler for HtmlRewriter {
-    async fn run(&self, mut conn: Conn) -> Conn {
+    async fn before_send(&self, mut conn: Conn) -> Conn {
         let html = conn
             .response_headers()
             .get_str(ContentType)
@@ -56,10 +61,14 @@ impl Handler for HtmlRewriter {
 }
 
 impl HtmlRewriter {
-    /**
-    construct a new html rewriter from the provided `fn() -> Settings`. See
-    [`lol_async::html::Settings`] for more information.
-     */
+    /// Construct a new html rewriter from a closure that builds [`Settings`].
+    ///
+    /// The closure — rather than a `Settings` value — is required because `lol-html`'s content
+    /// handlers are single-use; it is invoked once per rewritten response to produce a fresh set of
+    /// handlers. Build the settings with [`Settings::new_send()`] as the base (its handlers are
+    /// `Send`, as required here) and populate `element_content_handlers` /
+    /// `document_content_handlers`. See [`lol_async::html::Settings`] and the
+    /// [`lol-html`](https://docs.rs/lol-html) docs for the full rewriting API.
     pub fn new(f: impl Fn() -> Settings<'static, 'static> + Send + Sync + 'static) -> Self {
         Self {
             settings: Arc::new(f)
