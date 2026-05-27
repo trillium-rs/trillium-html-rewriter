@@ -10,7 +10,7 @@ pub fn main() {
     env_logger::init();
     let client_config = RustlsConfig::<ClientConfig>::default();
     trillium_smol::run((
-        Proxy::new(client_config, "https://httpbin.org").without_halting(),
+        Proxy::new(client_config, "https://httpbin.org"),
         HtmlRewriter::new(|| Settings {
             element_content_handlers: vec![element!("body", |el| {
                 el.prepend("<h1>rewritten</h1>", ContentType::Html);
