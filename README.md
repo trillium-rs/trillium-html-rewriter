@@ -19,12 +19,11 @@ let handler = (
             .with_status(200)
             .with_body("<html><body><p>body</p></body></html>")
     },
-    HtmlRewriter::new(|| Settings {
-        element_content_handlers: vec![element!("body", |el| {
+    HtmlRewriter::new(|| {
+        Settings::new_send().append_element_content_handler(element!("body", |el| {
             el.prepend("<h1>title</h1>", ContentType::Html);
             Ok(())
-        })],
-        ..Settings::new_send()
+        }))
     }),
 );
 
@@ -57,18 +56,16 @@ block_on(async move {
   ```rust,no_run
   use trillium_html_rewriter::{HtmlRewriter, html::{Settings, element, html_content::ContentType}};
   use trillium_proxy::Proxy;
-  use trillium_rustls::RustlsConfig;
   use trillium_smol::ClientConfig;
 
   trillium_smol::run((
-      Proxy::new(RustlsConfig::<ClientConfig>::default(), "https://example.com"),
-      HtmlRewriter::new(|| Settings {
-          element_content_handlers: vec![element!("body", |el| {
+      Proxy::new(ClientConfig::default(), "http://example.com"),
+      HtmlRewriter::new(|| {
+          Settings::new_send().append_element_content_handler(element!("body", |el| {
               el.prepend("<h1>rewritten</h1>", ContentType::Html);
               Ok(())
-          })],
-          ..Settings::new_send()
-      }),
+          }))
+      })
   ));
   ```
 

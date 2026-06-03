@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-03
+
+- [**breaking**] Upgrade to `lol-async@0.4` and `lol-html@3`
+
 ## [0.5.0] - 2026-05-27
 
 - [**breaking**] run rewriting in Handler::before_send instead of in Handler::run
