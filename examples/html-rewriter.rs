@@ -3,21 +3,17 @@ use trillium_html_rewriter::{
     html::{Settings, element, html_content::ContentType},
 };
 use trillium_proxy::Proxy;
-use trillium_rustls::RustlsConfig;
 use trillium_smol::ClientConfig;
 
 pub fn main() {
     env_logger::init();
-    let client_config = RustlsConfig::<ClientConfig>::default();
     trillium_smol::run((
-        Proxy::new(client_config, "https://httpbin.org"),
-        HtmlRewriter::new(|| Settings {
-            element_content_handlers: vec![element!("body", |el| {
+        Proxy::new(ClientConfig::default(), "http://httpbin.org"),
+        HtmlRewriter::new(|| {
+            Settings::new_send().append_element_content_handler(element!("body", |el| {
                 el.prepend("<h1>rewritten</h1>", ContentType::Html);
                 Ok(())
-            })],
-
-            ..Settings::new_send()
+            }))
         }),
     ));
 }
