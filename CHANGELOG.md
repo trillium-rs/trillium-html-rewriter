@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1](https://github.com/trillium-rs/trillium-html-rewriter/compare/v0.6.0...v0.6.1) - 2026-06-22
+
+### Other
+
+- Bump lukka/get-cmake from 4.3.2 to 4.3.4
+- Bump actions/checkout from 6 to 7
+
 ## [0.6.0] - 2026-06-03
 
 - [**breaking**] Upgrade to `lol-async@0.4` and `lol-html@3`
