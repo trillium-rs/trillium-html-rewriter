@@ -75,9 +75,16 @@ block_on(async move {
 
 ## Constructing settings
 
-`HtmlRewriter::new` takes a `Fn() -> Settings`, not a `Settings` value, because `lol-html`'s content
-handlers are single-use: the closure is invoked once per rewritten response to build a fresh set of
-handlers. Use [`Settings::new_send()`](https://docs.rs/lol-async) as the base (its handlers are
+`HtmlRewriter` is constructed from a settings-building function, not a `Settings` value, because
+`lol-html`'s content handlers are single-use: the function is invoked once per rewritten response
+to build a fresh set of handlers. Three constructors are available, named for what the settings
+may depend on:
+
+* `HtmlRewriter::new(|| …)` — the same rewrite for every response
+* `HtmlRewriter::new_with_conn(|conn| …)` — settings that depend on the request or response
+* `HtmlRewriter::new_async(async |conn: &Conn| …)` — settings that additionally await async work
+
+Use [`Settings::new_send()`](https://docs.rs/lol-async) as the base (its handlers are
 `Send`, as required to move between trillium's tasks) and fill in `element_content_handlers` /
 `document_content_handlers`. See the [`lol-html` docs](https://docs.rs/lol-html) for the full
 rewriting API — [`element!`](https://docs.rs/lol-html/latest/lol_html/macro.element.html),
@@ -85,3 +92,65 @@ rewriting API — [`element!`](https://docs.rs/lol-html/latest/lol_html/macro.el
 [`text!`](https://docs.rs/lol-html/latest/lol_html/macro.text.html), and the
 [`Element`](https://docs.rs/lol-html/latest/lol_html/html_content/struct.Element.html) API for
 inspecting and mutating matched elements.
+
+## Rewriting per request
+
+The settings function passed to `HtmlRewriter::new_with_conn` receives the
+[`Conn`](https://docs.rs/trillium/latest/trillium/struct.Conn.html) whose response is about to be
+rewritten, so the rewrite can depend on the request — its path, its headers, or state set by an
+earlier handler:
+
+```rust
+use trillium_html_rewriter::{
+    HtmlRewriter, Settings,
+    html::{element, html_content::ContentType},
+};
+
+HtmlRewriter::new_with_conn(|conn| {
+    let path = conn.path().to_string();
+    Settings::new_send().append_element_content_handler(element!("head", move |el| {
+        el.prepend(&format!(r#"<link rel="canonical" href="{path}">"#), ContentType::Html);
+        Ok(())
+    }))
+});
+```
+
+Data read from the conn must be **moved** into the content handlers, which outlive the conn
+borrow, moving into the streaming body.
+
+## Async settings
+
+`HtmlRewriter::new_async` accepts an *async* function, which can await a database query, an http
+request, or any other async work while borrowing the conn:
+
+```rust
+use trillium::Conn;
+use trillium_html_rewriter::{
+    HtmlRewriter, Settings,
+    html::{element, html_content::ContentType},
+};
+
+async fn canonical_url(path: &str) -> String {
+    format!("https://example.com{path}")
+}
+
+HtmlRewriter::new_async(async |conn: &Conn| {
+    let url = canonical_url(conn.path()).await;
+    Settings::new_send().append_element_content_handler(element!("head", move |el| {
+        el.prepend(&format!(r#"<link rel="canonical" href="{url}">"#), ContentType::Html);
+        Ok(())
+    }))
+});
+```
+
+Two things to know about the closure forms `new_async` accepts:
+
+* The `&Conn` parameter annotation is required — type inference cannot supply it.
+* An async closure must not capture its environment. To use captured state (a client handle,
+  configuration, …), write a plain closure that clones what it needs — from its environment and
+  from the conn — into an async block it returns:
+  `move |conn: &Conn| { let client = client.clone(); async move { /* … */ } }`. See the
+  `HtmlRewriter::new_async` docs for a complete example.
+
+Whichever constructor is used, the settings function runs only for responses that are actually
+rewritten, so no work is done for non-HTML responses.
