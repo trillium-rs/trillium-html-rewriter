@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2](https://github.com/trillium-rs/trillium-html-rewriter/compare/v0.6.1...v0.6.2) - 2026-09-02
+
+### Other
+
+- *(deps)* update swatinem/rust-cache action to v2.9.2
+- *(deps)* bump github/codeql-action from 4.37.8 to 4.37.9
+- *(deps)* bump lukka/get-cmake from 4.4.1 to 4.4.2
+- Add renovate.json
+- *(deps)* bump github/codeql-action from 4.37.3 to 4.37.8
+- *(deps)* bump github/codeql-action from 4 to 4.37.3
+- *(deps)* bump lukka/get-cmake from 4.4.0 to 4.4.1
+
 ## [0.6.1](https://github.com/trillium-rs/trillium-html-rewriter/compare/v0.6.0...v0.6.1) - 2026-07-22
 
 ### Added
